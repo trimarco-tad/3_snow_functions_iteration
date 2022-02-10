@@ -190,8 +190,7 @@ headers <- pdf_text('https://snowstudies.org/wp-content/uploads/2022/02/Serially
   .[,2] %>%
   .[1:26] %>%
   str_trim(side = "left")
- headers_q3 <- append(headers,c(27:50))
- headers_q3 <- as.vector(headers_q3)
+
 read_files_hw <- function(file){
 
                       site_name <- str_split_fixed(file,'_',3)[,2]
@@ -207,6 +206,7 @@ read_files_hw <- function(file){
 
 ```{r}
 meteor_data_full <- map_dfr(file_names_hw,read_files_hw)
+meteor_data_full
 ```
 
 
@@ -225,7 +225,8 @@ ggplot(meteor_yearly,aes(x=year,y=mean_temp,color=site)) +
 
 
 ```
-The year 2003 had abnormally low temperatures (a mean temperature of almost 10 degrees cooler than the following years). This is likely an issue in how the data was recorded or stored in earlier years, so 2003 is simply filtered out.
+
+The year 2003 had abnormally low temperatures (a mean temperature of almost 10 degrees cooler than the following years). This is likely an issue in how the data was recorded or stored in earlier years, so 2003 is filtered out. It is likely not conceivable that an entire year was on average 10 degrees cooler than the rest of the years.
 
 6. Write a function that makes line plots of monthly average temperature at each site for a given year. Use a for loop to make these plots for 2005 to 2010. Are monthly average temperatures at the Senator Beck Study Plot ever warmer than the Snow Angel Study Plot?
 Hint: https://ggplot2.tidyverse.org/reference/print.ggplot.html
@@ -234,7 +235,6 @@ Hint: https://ggplot2.tidyverse.org/reference/print.ggplot.html
 
 monthly_temp <- function(data = meteor_data_full){
 
-  
   meteor_monthly <- meteor_data_full %>%
     group_by(year,month,site) %>%
     summarize(mean_temp = mean(`air temp [K]`,na.rm=T))
@@ -248,7 +248,8 @@ for(i in c(2005:2010)){
    
     print(ggplot(gg_data,aes(x=month,y=mean_temp,color=site)) + 
           geom_point() + geom_line() +
-          ggtitle(i) + ylab("Mean Air Temperature (K)") +
+          ggtitle(i) + ylab("Mean Air Temperature (K)") + xlab("Month") +
+          ylim(min = 255, max = 290) +
           ggthemes::theme_few() + 
           ggthemes::scale_color_few())
   }
@@ -257,7 +258,10 @@ for(i in c(2005:2010)){
 monthly_temp()
 
 ```
-At no point from 2005-2010 is the monthly average temperature at the Senator Beck site higher than that at the Snow Angel site.
+
+At no point from 2005-2010 is the monthly average temperature at the Senator Beck site higher than that at the Snow Angel site. Each year follows generally the same pattern of average monthly temperatures, with some variation year to year, particularly it seems in the spring and fall months. Notable, the difference between average monthly temperatures seems roughly consistent across months and across years. Neither site seems to be warming or cooling in relation to each other. While this data is limited, it does seem that the peak is widening slightly and moving further to the right, potentially indicating longer periods of summer temperatures, and that these periods are occurring slightly later in the year.
+
+
 
 Bonus: Make a plot of average daily precipitation by day of year (averaged across all available years). Color each site. 
 
